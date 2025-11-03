@@ -1,5 +1,5 @@
 DOCKER := docker compose
-PROJECT_NAME := nifi-ci-cd-core
+PROJECT_NAME := finalproject
 include .env
 export
 
@@ -54,3 +54,19 @@ logs-nifi:
 ## Follow logs from NiFi Registry only
 logs-registry:
 	@$(DOCKER) logs -f nifi-registry
+
+# clean up docker volumes
+clean-volumes:
+	@echo "🧹 Cleaning up..."
+	@docker volume rm $(PROJECT_NAME)_nifi_registry_database
+	@docker volume rm $(PROJECT_NAME)_nifi_registry_flow_storage
+	@docker volume rm $(PROJECT_NAME)_nifi_database_repository
+	@docker volume rm $(PROJECT_NAME)_nifi_flowfile_repository
+	@docker volume rm $(PROJECT_NAME)_nifi_content_repository
+	@docker volume rm $(PROJECT_NAME)_nifi_provenance_repository
+	@docker volume rm $(PROJECT_NAME)_nifi_nar_extensions
+	@docker volume rm $(PROJECT_NAME)_nifi_python_extensions
+	@docker volume rm $(PROJECT_NAME)_nifi_conf
+	@docker volume rm $(PROJECT_NAME)_nifi_state
+	@docker volume rm $(PROJECT_NAME)_nifi_logs
+	@echo "✅ Cleanup complete."

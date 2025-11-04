@@ -1,10 +1,10 @@
 DOCKER := docker compose
-PROJECT_NAME := nifi-ci-cd-core
+PROJECT_NAME := finalproject-nifi-toolkit
 include .env
 export
 
 # Targets
-.PHONY: all setup up down logs logs-nifi logs-registry
+.PHONY: all setup up down logs logs-nifi logs-registry shell-toolkit
 
 ## Start all services and follow logs
 all: up echo
@@ -33,13 +33,13 @@ echo:
 
 ## Start all services
 up: 
-	@echo "🚀 Starting NiFi and NiFi Registry..."
+	@echo "🚀 Starting NiFi, NiFi Registry, and NiFi Toolkit ..."
 	@$(DOCKER) up -d
 	@echo "✅ Services started."
 
 ## Stop all services
 down:
-	@echo "🛑 Stopping NiFi and NiFi Registry..."
+	@echo "🛑 Stopping NiFi, NiFi Registry, and NiFi Toolkit..."
 	@$(DOCKER) down
 	@echo "✅ Services stopped."
 
@@ -54,3 +54,31 @@ logs-nifi:
 ## Follow logs from NiFi Registry only
 logs-registry:
 	@$(DOCKER) logs -f nifi-registry
+## Follow logs from NiFi Toolkit only
+logs-toolkit:
+	@$(DOCKER) logs -f nifi-toolkit
+
+## Open NiFi CLI interactive mode in toolkit container
+shell-toolkit:
+	@echo "🔧 Opening NiFi Toolkit CLI interactive shell..."
+	@echo "💡 Use this to run CLI commands against NiFi and NiFi Registry"
+	@echo "💡 Type 'exit' to quit"
+	@echo ""
+	@$(DOCKER) exec -it nifi-toolkit /bin/bash
+
+# clean up docker volumes
+clean-volumes:
+	@echo "🧹 Cleaning up..."
+	@docker volume rm $(PROJECT_NAME)_nifi_registry_database
+	@docker volume rm $(PROJECT_NAME)_nifi_registry_flow_storage
+	@docker volume rm $(PROJECT_NAME)_nifi_database_repository
+	@docker volume rm $(PROJECT_NAME)_nifi_flowfile_repository
+	@docker volume rm $(PROJECT_NAME)_nifi_content_repository
+	@docker volume rm $(PROJECT_NAME)_nifi_provenance_repository
+	@docker volume rm $(PROJECT_NAME)_nifi_nar_extensions
+	@docker volume rm $(PROJECT_NAME)_nifi_python_extensions
+	@docker volume rm $(PROJECT_NAME)_nifi_conf
+	@docker volume rm $(PROJECT_NAME)_nifi_state
+	@docker volume rm $(PROJECT_NAME)_nifi_logs
+	@docker volume rm $(PROJECT_NAME)_nifi_toolkit
+	@echo "✅ Cleanup complete."

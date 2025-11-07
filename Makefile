@@ -4,7 +4,7 @@ include .env
 export
 
 # Targets
-.PHONY: all setup up down logs logs-nifi logs-registry
+.PHONY: all setup up down logs logs-nifi logs-registry shell-toolkit
 
 ## Start all services and follow logs
 all: up echo
@@ -33,13 +33,13 @@ echo:
 
 ## Start all services
 up: 
-	@echo "🚀 Starting NiFi and NiFi Registry..."
+	@echo "🚀 Starting NiFi, NiFi Registry, and NiFi Toolkit ..."
 	@$(DOCKER) up -d
 	@echo "✅ Services started."
 
 ## Stop all services
 down:
-	@echo "🛑 Stopping NiFi and NiFi Registry..."
+	@echo "🛑 Stopping NiFi, NiFi Registry, and NiFi Toolkit..."
 	@$(DOCKER) down
 	@echo "✅ Services stopped."
 

@@ -10,6 +10,7 @@ volumes:
   nifi_conf:
   nifi_state:
   nifi_logs:
+  nifi_toolkit:
 
 networks:
   nifi_network:
@@ -29,6 +30,7 @@ services:
     volumes:
       - nifi_registry_database:/opt/nifi-registry/nifi-registry-current/database
       - nifi_registry_flow_storage:/opt/nifi-registry/nifi-registry-current/flow_storage
+      - ./backups:/backups
     networks:
       - nifi_network
     healthcheck:
@@ -45,8 +47,8 @@ services:
     ports:
       - "8443:8443"
     environment:
-      - SINGLE_USER_CREDENTIALS_USERNAME=$NIFI_USERNAME
-      - SINGLE_USER_CREDENTIALS_PASSWORD=$NIFI_PASSWORD
+      - SINGLE_USER_CREDENTIALS_USERNAME=${NIFI_USERNAME}
+      - SINGLE_USER_CREDENTIALS_PASSWORD=${NIFI_PASSWORD}
       - NIFI_WEB_HTTPS_PORT=8443
       - NIFI_WEB_HTTPS_HOST=0.0.0.0
       - NIFI_WEB_PROXY_HOST=localhost:8443
@@ -65,6 +67,7 @@ services:
       - nifi_state:/opt/nifi/nifi-current/state
       - nifi_logs:/opt/nifi/nifi-current/logs
       - ./extensions:/opt/nifi/nifi-current/extensions
+      - ./backups:/backups
     networks:
       - nifi_network
     depends_on:
@@ -76,3 +79,29 @@ services:
       timeout: 10s
       retries: 5
       start_period: 60s
+
+  nifi-toolkit:
+    image: apache/nifi-toolkit:2.6.0
+    container_name: nifi-toolkit
+    entrypoint: /bin/bash
+    stdin_open: true
+    tty: true
+    user: root
+    environment:
+      - NIFI_USERNAME=${NIFI_USERNAME}
+      - NIFI_PASSWORD=${NIFI_PASSWORD}
+    volumes:
+      - nifi_toolkit:/opt/nifi-toolkit
+      - ./backups:/backups
+      - ./scripts:/scripts:ro
+    networks:
+      - nifi_network
+    depends_on:
+      nifi:
+        condition: service_healthy
+    restart: "no"
+    healthcheck:
+      test: ["CMD", "ls", "/opt/nifi-toolkit"]
+      interval: 30s
+      timeout: 10s
+      retries: 3

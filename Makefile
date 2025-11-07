@@ -1,5 +1,5 @@
 DOCKER := docker compose
-PROJECT_NAME := finalproject-nifi-toolkit
+PROJECT_NAME := finalproject
 include .env
 export
 
@@ -54,17 +54,6 @@ logs-nifi:
 ## Follow logs from NiFi Registry only
 logs-registry:
 	@$(DOCKER) logs -f nifi-registry
-## Follow logs from NiFi Toolkit only
-logs-toolkit:
-	@$(DOCKER) logs -f nifi-toolkit
-
-## Open NiFi CLI interactive mode in toolkit container
-shell-toolkit:
-	@echo "🔧 Opening NiFi Toolkit CLI interactive shell..."
-	@echo "💡 Use this to run CLI commands against NiFi and NiFi Registry"
-	@echo "💡 Type 'exit' to quit"
-	@echo ""
-	@$(DOCKER) exec -it nifi-toolkit /bin/bash
 
 # clean up docker volumes
 clean-volumes:
@@ -80,5 +69,4 @@ clean-volumes:
 	@docker volume rm $(PROJECT_NAME)_nifi_conf
 	@docker volume rm $(PROJECT_NAME)_nifi_state
 	@docker volume rm $(PROJECT_NAME)_nifi_logs
-	@docker volume rm $(PROJECT_NAME)_nifi_toolkit
 	@echo "✅ Cleanup complete."
